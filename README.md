@@ -120,11 +120,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Pi-hole](https://pi-hole.net/) - The core DNS server
 - [Ookla Speedtest CLI](https://www.speedtest.net/apps/cli) - The speedtest tool
 - [Chart.js](https://www.chartjs.org/) - For beautiful charts
-
-## Buy me a ☕️
-
-Buy @arevindh a ☕️ if you like this project :)
-
-<a href="https://www.buymeacoffee.com/itsmesid" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-
-@ipitio is not accepting donations at this time, but a star is always appreciated!
+- [Original Pi-hole Speedtest Mod](https://github.com/arevindh/pihole-speedtest) - The original project by @arevindh

@@ -5,6 +5,7 @@ RUN curl -sSL https://github.com/saqibj/pihole-6-speedtest/raw/main/mod | sudo b
 
 # Set the default tag
 LABEL maintainer="saqibj"
-LABEL version="pihole-6"
+LABEL version="2.0.0"
+LABEL pihole_version="6.x"
 
 EXPOSE 53/tcp 53/udp 80/tcp

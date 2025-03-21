@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Version information
+MOD_VERSION="2.0.0"
+REQUIRED_PIHOLE_VERSION="6.x"
+
 # Check if Pi-hole is installed
 if ! command -v pihole &> /dev/null; then
     echo "Pi-hole is not installed. Please install Pi-hole first."
@@ -15,7 +19,7 @@ fi
 
 # Check if version is 6.x
 if [[ ! "$PIHOLE_VERSION" =~ ^6\. ]]; then
-    echo "This mod is designed for Pi-hole 6.x. Your version is $PIHOLE_VERSION"
+    echo "This mod (v${MOD_VERSION}) is designed for Pi-hole ${REQUIRED_PIHOLE_VERSION}. Your version is $PIHOLE_VERSION"
     exit 1
 fi
 
