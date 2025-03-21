@@ -1,2 +1,8 @@
 FROM pihole/pihole:latest
-RUN curl -sSL https://github.com/arevindh/pihole-speedtest/raw/master/mod | sudo bash
+
+# Install the speedtest mod
+RUN curl -sSL https://github.com/arevindh/pihole-speedtest/raw/pihole-6-compatibility/mod | sudo bash
+
+# Set the default tag
+LABEL maintainer="arevindh"
+LABEL version="pihole-6"
