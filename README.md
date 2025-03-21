@@ -15,7 +15,7 @@ This project is a few things, the major parts being a Pi-hole extension and a sp
 
 The Test Script is a standalone tool that can be used to run speedtests on automated Debian or Fedora based systems. It will install a speedtest CLI if one hasn't been, run a test, and save the results to a new or existing database. You can use it to test your connection, monitor your ISP, or check the speed of your VPN. Let us know how you're using it! See usage for details.
 
-    curl -sSL https://github.com/arevindh/pihole-speedtest/raw/pihole-6-compatibility/test | sudo bash -s -- -o ~/speedtest.db
+    curl -sSL https://github.com/saqibj/pihole-speedtest/raw/pihole-6-compatibility/test | sudo bash -s -- -o ~/speedtest.db
 
 Please keep in mind that the more tests you run, the more data will be used, and any issues about weird results should be directed to the maintainers of whichever speedtest CLI is installed on your system, not here.
 
@@ -39,20 +39,20 @@ The Mod Script is our installation manager; it automates the process of applying
 
 You can just pipe to bash:
 
-    curl -sSL https://github.com/arevindh/pihole-speedtest/raw/pihole-6-compatibility/mod | sudo bash
+    curl -sSL https://github.com/saqibj/pihole-speedtest/raw/pihole-6-compatibility/mod | sudo bash
 
 #### With Docker
 
 The above goes for Docker as well. We use the Dockerfile in this repo to build an image with the Mod Script already applied. Simply change the image you're using to ours and proceed as usual. It's a drop-in replacement.
 
-    ghcr.io/arevindh/pihole-speedtest:pihole-6
+    ghcr.io/saqibj/pihole-speedtest:pihole-6
 
 You can also run the Mod Script inside every new container yourself. For example, if you're using Compose, by replacing the `image` line with:
 
     build:
         dockerfile_inline: |
             FROM pihole/pihole:latest
-            RUN curl -sSL https://github.com/arevindh/pihole-speedtest/raw/pihole-6-compatibility/mod | sudo bash
+            RUN curl -sSL https://github.com/saqibj/pihole-speedtest/raw/pihole-6-compatibility/mod | sudo bash
 
 Then pull and rebuild without cache:
 

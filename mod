@@ -20,4 +20,4 @@ if [[ ! "$PIHOLE_VERSION" =~ ^6\. ]]; then
 fi
 
 # Download and execute the Pi-hole 6 compatible mod script
-curl -sSLN https://github.com/arevindh/pi-hole/raw/pihole-6/advanced/Scripts/speedtestmod/mod.sh | sudo bash -s -- "$@"
+curl -sSLN https://github.com/saqibj/pi-hole/raw/pihole-6/advanced/Scripts/speedtestmod/mod.sh | sudo bash -s -- "$@"
