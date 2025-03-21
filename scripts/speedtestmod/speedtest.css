@@ -1,0 +1,41 @@
+#speedtest-chart {
+    height: 300px;
+    margin-bottom: 20px;
+}
+
+.speedtest-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.speedtest-stat {
+    text-align: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    flex: 1;
+    margin: 0 5px;
+}
+
+.speedtest-stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #3c8dbc;
+}
+
+.speedtest-stat-label {
+    font-size: 14px;
+    color: #666;
+}
+
+#run-speedtest {
+    margin-top: 10px;
+}
+
+.speedtest-settings {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 4px;
+} 
