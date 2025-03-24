@@ -81,4 +81,4 @@ fi
 
 echo "Speedtest mod installed successfully!"
 echo "Please restart Pi-hole's web interface to apply changes:"
-echo "sudo systemctl restart lighttpd" 
+echo "sudo systemctl restart lighttpd"
