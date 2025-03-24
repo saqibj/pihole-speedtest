@@ -62,23 +62,40 @@ sudo cp "$SCRIPT_DIR/speedtest.js" "$WEB_DIR/scripts/js/"
 sudo cp "$SCRIPT_DIR/speedtest.css" "$WEB_DIR/style/"
 
 # Add speedtest widget to dashboard
-if ! grep -q "speedtest" "$WEB_DIR/index.lp"; then
+if ! grep -q "speedtest" "$WEB_DIR/index.php"; then
     echo "Adding speedtest widget to dashboard..."
-    sudo sed -i '/<!-- Add Speedtest Widget -->/a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$WEB_DIR/index.lp"
+    sudo sed -i '/<div class="row">/ a <!-- Add Speedtest Widget -->' "$WEB_DIR/index.php"
+    sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$WEB_DIR/index.php"
 fi
 
 # Add speedtest settings to system settings
-if ! grep -q "speedtest" "$WEB_DIR/settings-system.lp"; then
+if ! grep -q "speedtest" "$WEB_DIR/settings.php"; then
     echo "Adding speedtest settings..."
-    sudo sed -i '/<!-- Add Speedtest Settings -->/a\    <div class="box box-primary">\n      <div class="box-header with-border">\n        <h3 class="box-title">Speedtest Settings</h3>\n      </div>\n      <div class="box-body">\n        <div class="form-group">\n          <label for="speedtest-interval">Test Interval (hours)</label>\n          <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n        </div>\n        <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n      </div>\n    </div>' "$WEB_DIR/settings-system.lp"
+    sudo sed -i '/<div class="col-md-12">/ a <!-- Add Speedtest Settings -->' "$WEB_DIR/settings.php"
+    sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="box box-primary">\n      <div class="box-header with-border">\n        <h3 class="box-title">Speedtest Settings</h3>\n      </div>\n      <div class="box-body">\n        <div class="form-group">\n          <label for="speedtest-interval">Test Interval (hours)</label>\n          <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n        </div>\n        <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n      </div>\n    </div>' "$WEB_DIR/settings.php"
 fi
 
 # Add speedtest script to page
-if ! grep -q "speedtest.js" "$WEB_DIR/index.lp"; then
+if ! grep -q "speedtest.js" "$WEB_DIR/index.php"; then
     echo "Adding speedtest script to page..."
-    sudo sed -i '/<!-- Add Speedtest Script -->/a\    <script src="scripts/js/speedtest.js"></script>' "$WEB_DIR/index.lp"
+    sudo sed -i '/<\/body>/ i <!-- Add Speedtest Script -->' "$WEB_DIR/index.php"
+    sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$WEB_DIR/index.php"
+fi
+
+# Set proper permissions
+echo "Setting proper permissions..."
+sudo chown -R www-data:www-data "$WEB_DIR/scripts/js/speedtest.js"
+sudo chown -R www-data:www-data "$WEB_DIR/style/speedtest.css"
+sudo chmod 644 "$WEB_DIR/scripts/js/speedtest.js"
+sudo chmod 644 "$WEB_DIR/style/speedtest.css"
+
+# Restart Pi-hole FTL service
+echo "Restarting Pi-hole FTL service..."
+if command -v systemctl &> /dev/null; then
+    sudo systemctl restart pihole-FTL
+else
+    sudo service pihole-FTL restart
 fi
 
 echo "Speedtest mod installed successfully!"
-echo "Please restart Pi-hole's web interface to apply changes:"
-echo "sudo systemctl restart lighttpd"
+echo "Please refresh your Pi-hole web interface to see the changes."
