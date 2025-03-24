@@ -26,8 +26,13 @@ fi
 # Define paths
 PIHOLE_DIR="/etc/.pihole"
 WEB_DIR="/var/www/html/admin"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DB_DIR="/etc/pihole/pihole-6-speedtest"
+
+# Verify SCRIPT_DIR is set
+if [ -z "$SCRIPT_DIR" ]; then
+    echo "Error: SCRIPT_DIR environment variable is not set"
+    exit 1
+fi
 
 # Install speedtest CLI if not present
 if ! command -v speedtest &> /dev/null; then
@@ -51,6 +56,8 @@ sudo chmod +x /usr/local/bin/pihole-6-speedtest
 
 # Create web interface files
 echo "Installing web interface files..."
+sudo mkdir -p "$WEB_DIR/scripts/js/"
+sudo mkdir -p "$WEB_DIR/style/"
 sudo cp "$SCRIPT_DIR/speedtest.js" "$WEB_DIR/scripts/js/"
 sudo cp "$SCRIPT_DIR/speedtest.css" "$WEB_DIR/style/"
 
