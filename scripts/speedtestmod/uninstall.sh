@@ -23,6 +23,58 @@ log_debug() {
     echo "[DEBUG] $(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
+# Function to safely modify files
+safe_modify_file() {
+    local file="$1"
+    local pattern="$2"
+    local replacement="$3"
+    
+    if [ ! -f "$file" ]; then
+        log_error "File not found: $file"
+        return 1
+    }
+    
+    # Create backup
+    local backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
+    if ! sudo cp "$file" "$backup"; then
+        log_error "Failed to create backup of $file"
+        return 1
+    fi
+    
+    # Create temporary file
+    local temp_file=$(mktemp)
+    if ! sudo cp "$file" "$temp_file"; then
+        log_error "Failed to create temporary file for $file"
+        return 1
+    fi
+    
+    # Modify the temporary file
+    if ! sudo sed -i "$pattern" "$temp_file"; then
+        log_error "Failed to modify $file"
+        sudo rm "$temp_file"
+        return 1
+    fi
+    
+    # Move temporary file back
+    if ! sudo mv "$temp_file" "$file"; then
+        log_error "Failed to update $file"
+        sudo rm "$temp_file"
+        return 1
+    fi
+    
+    # Set correct permissions
+    if ! sudo chown www-data:www-data "$file"; then
+        log_error "Failed to set permissions on $file"
+        return 1
+    fi
+    if ! sudo chmod 644 "$file"; then
+        log_error "Failed to set permissions on $file"
+        return 1
+    fi
+    
+    return 0
+}
+
 # Check if Pi-hole is installed
 log_info "Checking if Pi-hole is installed..."
 if ! command -v pihole &> /dev/null; then
@@ -86,15 +138,6 @@ if [ -z "$INDEX_FILE" ]; then
     exit 1
 fi
 
-# Backup the index file
-log_info "Creating backup of index file..."
-BACKUP_FILE="${INDEX_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
-if ! sudo cp "$INDEX_FILE" "$BACKUP_FILE"; then
-    log_error "Failed to create backup of index file"
-else
-    log_info "Created backup at: $BACKUP_FILE"
-fi
-
 # Remove speedtest files
 log_info "Removing speedtest files..."
 if [ -f "$WEB_DIR/scripts/js/speedtest.js" ]; then
@@ -132,21 +175,13 @@ fi
 
 # Remove speedtest widget from dashboard
 log_info "Checking for speedtest widget in dashboard..."
-# First, let's check the content around the widget
 if grep -q "speedtest" "$INDEX_FILE"; then
     log_debug "Found speedtest references in index file"
-    # Create a temporary file for the new content
-    TEMP_FILE=$(mktemp)
-    
-    # Remove the widget section while preserving the rest of the content
-    if ! awk '/<!-- Add Speedtest Widget -->/{p=1;next}p&&/<!-- \/\.\/col -->/{p=0;next}!p' "$INDEX_FILE" > "$TEMP_FILE"; then
-        log_error "Failed to remove speedtest widget (standard pattern)"
+    # Remove the widget section
+    if ! safe_modify_file "$INDEX_FILE" '/<!-- Add Speedtest Widget -->/,/<!-- \/\.\/col -->\n<\/div>/d' ""; then
+        log_error "Failed to remove speedtest widget"
     else
-        log_info "Successfully removed speedtest widget (standard pattern)"
-        # Move the temporary file back to the original
-        if ! sudo mv "$TEMP_FILE" "$INDEX_FILE"; then
-            log_error "Failed to update index file"
-        fi
+        log_info "Successfully removed speedtest widget"
     fi
 else
     log_debug "No speedtest references found in index file"
@@ -156,24 +191,16 @@ fi
 log_info "Checking for speedtest script in page..."
 if grep -q "speedtest.js" "$INDEX_FILE"; then
     log_debug "Found speedtest script reference, removing..."
-    # Create a temporary file for the new content
-    TEMP_FILE=$(mktemp)
-    
-    # Remove the script section while preserving the rest of the content
-    if ! awk '/<!-- Add Speedtest Script -->/{p=1;next}p&&/<script src="<?=pihole.fileversion('\''scripts\/js\/speedtest.js'\'')?>">/{p=0;next}!p' "$INDEX_FILE" > "$TEMP_FILE"; then
+    # Remove the script section
+    if ! safe_modify_file "$INDEX_FILE" '/<!-- Add Speedtest Script -->/,/<script src="<?=pihole.fileversion('\''scripts\/js\/speedtest.js'\'')?>">/d' ""; then
         log_debug "Failed to remove script (standard pattern), trying alternative..."
-        if ! grep -v 'speedtest.js' "$INDEX_FILE" > "$TEMP_FILE"; then
+        if ! safe_modify_file "$INDEX_FILE" '/speedtest.js/d' ""; then
             log_error "Failed to remove speedtest script reference"
         else
             log_info "Successfully removed speedtest script reference (alternative pattern)"
         fi
     else
         log_info "Successfully removed speedtest script reference (standard pattern)"
-    fi
-    
-    # Move the temporary file back to the original
-    if ! sudo mv "$TEMP_FILE" "$INDEX_FILE"; then
-        log_error "Failed to update index file"
     fi
 else
     log_debug "Speedtest script reference not found in page"
@@ -186,18 +213,11 @@ if [ -f "$SETTINGS_FILE" ]; then
     log_debug "Found settings file, checking for speedtest settings..."
     if grep -q "speedtest" "$SETTINGS_FILE"; then
         log_debug "Found speedtest settings, removing..."
-        # Create a temporary file for the new content
-        TEMP_FILE=$(mktemp)
-        
-        # Remove the speedtest settings section while preserving the rest of the content
-        if ! awk '/<!-- Add Speedtest Settings -->/{p=1;next}p&&/<!-- \/\.\/speedtest-settings -->/{p=0;next}!p' "$SETTINGS_FILE" > "$TEMP_FILE"; then
+        # Remove the speedtest settings section
+        if ! safe_modify_file "$SETTINGS_FILE" '/<!-- Add Speedtest Settings -->/,/<!-- \/\.\/speedtest-settings -->/d' ""; then
             log_error "Failed to remove speedtest settings"
         else
             log_info "Successfully removed speedtest settings"
-            # Move the temporary file back to the original
-            if ! sudo mv "$TEMP_FILE" "$SETTINGS_FILE"; then
-                log_error "Failed to update settings file"
-            fi
         fi
     else
         log_debug "No speedtest settings found in settings file"
