@@ -71,6 +71,18 @@ $(document).ready(function() {
         });
     });
 
+    // Save settings
+    $('#save-speedtest-settings').click(function() {
+        var interval = $('#speedtest-interval').val();
+        $.post('api.php?speedtest=interval', { interval: interval }, function(response) {
+            if (response.success) {
+                showMessage('Settings saved successfully', 'success');
+            } else {
+                showMessage('Error saving settings: ' + response.message, 'error');
+            }
+        });
+    });
+
     // Initial load
     loadSpeedtestData();
 }); 

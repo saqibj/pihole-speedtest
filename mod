@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Download the installation script
-INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/saqibj/pihole-speedtest/main/scripts/speedtestmod/install.sh"
+INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.1.3/scripts/speedtestmod/install.sh"
 TEMP_DIR=$(mktemp -d)
 INSTALL_SCRIPT="$TEMP_DIR/install.sh"
 
@@ -23,9 +23,9 @@ mkdir -p "$SPEEDTEST_DIR"
 
 # Download other required files
 echo "Downloading required files..."
-curl -sSL "https://raw.githubusercontent.com/saqibj/pihole-speedtest/main/scripts/speedtestmod/speedtest.sh" -o "$SPEEDTEST_DIR/speedtest.sh"
-curl -sSL "https://raw.githubusercontent.com/saqibj/pihole-speedtest/main/scripts/speedtestmod/speedtest.js" -o "$SPEEDTEST_DIR/speedtest.js"
-curl -sSL "https://raw.githubusercontent.com/saqibj/pihole-speedtest/main/scripts/speedtestmod/speedtest.css" -o "$SPEEDTEST_DIR/speedtest.css"
+curl -sSL "https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.1.3/scripts/speedtestmod/speedtest.sh" -o "$SPEEDTEST_DIR/speedtest.sh"
+curl -sSL "https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.1.3/scripts/speedtestmod/speedtest.js" -o "$SPEEDTEST_DIR/speedtest.js"
+curl -sSL "https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.1.3/scripts/speedtestmod/speedtest.css" -o "$SPEEDTEST_DIR/speedtest.css"
 
 # Make speedtest script executable
 chmod +x "$SPEEDTEST_DIR/speedtest.sh"

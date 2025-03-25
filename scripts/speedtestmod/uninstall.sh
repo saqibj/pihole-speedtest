@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version information
-MOD_VERSION="2.1.2"
+MOD_VERSION="2.1.3"
 REQUIRED_PIHOLE_VERSION="6.x"
 
 # Initialize error tracking
@@ -204,7 +204,7 @@ fi
 
 # Remove speedtest settings from settings page
 log_info "Checking for speedtest settings in settings page..."
-SETTINGS_FILE="$WEB_DIR/settings.php"
+SETTINGS_FILE="$WEB_DIR/scripts/pi-hole/php/speedtest-settings.php"
 if [ ! -f "$SETTINGS_FILE" ]; then
     SETTINGS_FILE="$WEB_DIR/scripts/pi-hole/php/settings.php"
 fi
@@ -264,6 +264,26 @@ else
         log_error "Failed to restart Pi-hole FTL service"
     else
         log_info "Successfully restarted Pi-hole FTL service"
+    fi
+fi
+
+# Remove speedtest settings page
+log_info "Removing speedtest settings page..."
+if [ -f "$WEB_DIR/scripts/pi-hole/php/speedtest-settings.php" ]; then
+    if ! sudo rm "$WEB_DIR/scripts/pi-hole/php/speedtest-settings.php"; then
+        log_error "Failed to remove speedtest settings page"
+    else
+        log_info "Successfully removed speedtest settings page"
+    fi
+fi
+
+# Remove navigation menu item
+log_info "Removing speedtest settings from navigation menu..."
+if grep -q "speedtest-settings.php" "$WEB_DIR/scripts/pi-hole/php/sidebar.php"; then
+    if ! sudo sed -i '/speedtest-settings.php/d' "$WEB_DIR/scripts/pi-hole/php/sidebar.php"; then
+        log_error "Failed to remove speedtest settings menu item"
+    else
+        log_info "Successfully removed speedtest settings menu item"
     fi
 fi
 

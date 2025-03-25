@@ -30,7 +30,7 @@ A Pi-hole extension that adds speedtest functionality directly to your Pi-hole d
 ### Quick Install
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/main/mod | sudo bash
+curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.1.3/mod | sudo bash
 ```
 
 ### Manual Installation
@@ -67,7 +67,7 @@ docker run -d \
 ### Quick Uninstall
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/main/scripts/speedtestmod/uninstall.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.1.3/scripts/speedtestmod/uninstall.sh | sudo bash
 ```
 
 ### Manual Uninstallation

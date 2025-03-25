@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.3] - 2024-03-25
+
+### Added
+- Added rollback mechanism for failed installations
+- Added verification steps for insertion points
+- Added separate settings page for speedtest configuration
+
+### Changed
+- Improved installation reliability with better error handling
+- Updated web interface integration to prevent duplicate elements
+- Enhanced logging and user feedback during installation
+
+### Fixed
+- Fixed multiple widget appearance issue
+- Fixed settings page integration
+- Fixed installation rollback process
+
 ## [2.1.2] - 2024-03-25
 
 ### Added
