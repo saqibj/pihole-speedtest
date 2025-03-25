@@ -230,12 +230,64 @@ if ! grep -q "speedtest.js" "$INDEX_FILE"; then
            sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
             SCRIPT_ADDED=1
         fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/footer.js\"" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/footer.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/custom.js\"" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/custom.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/network.js\"" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/network.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/scripts.js\"" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/scripts.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/gravity.js\"" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/gravity.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/whitelist.js\"" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/whitelist.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/blacklist.js\"" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/blacklist.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/domains.js\"" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/domains.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/ads.js\"" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/ads.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
     fi
     if [ $SCRIPT_ADDED -eq 0 ]; then
         log_error "Could not add speedtest script to page"
         echo "Please check the file structure of $INDEX_FILE"
         echo "You can manually add the following line to the file:"
         echo '    <script src="scripts/js/speedtest.js"></script>'
+        echo
+        echo "Common insertion points to try:"
+        echo "1. Before the closing </body> tag"
+        echo "2. After any existing <script> tag"
+        echo "3. After <!-- REQUIRED JS SCRIPTS -->"
+        echo "4. After <!-- Scripts -->"
+        echo "5. Before <!-- Footer -->"
     fi
 fi
 
