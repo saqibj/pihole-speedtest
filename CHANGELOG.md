@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2024-03-24
+
+### Changed
+- Improved error handling and reporting during installation
+- Added detailed error messages for each installation step
+- Enhanced installation success/failure feedback
+- Added proper error tracking and reporting system
+
+### Fixed
+- Installation script now properly reports failures
+- Success message only shows when installation is truly successful
+- Better handling of file modification failures
+- More accurate error reporting for file operations
+
 ## [2.1.0] - 2024-03-24
 
 ### Added

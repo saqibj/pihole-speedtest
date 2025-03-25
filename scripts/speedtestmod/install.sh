@@ -1,25 +1,36 @@
 #!/bin/bash
 
 # Version information
-MOD_VERSION="2.1.0"
+MOD_VERSION="2.1.1"
 REQUIRED_PIHOLE_VERSION="6.x"
+
+# Initialize error tracking
+INSTALL_ERRORS=0
+ERROR_MESSAGES=()
+
+# Function to log errors
+log_error() {
+    INSTALL_ERRORS=$((INSTALL_ERRORS + 1))
+    ERROR_MESSAGES+=("$1")
+    echo "Error: $1"
+}
 
 # Check if Pi-hole is installed
 if ! command -v pihole &> /dev/null; then
-    echo "Pi-hole is not installed. Please install Pi-hole first."
+    log_error "Pi-hole is not installed. Please install Pi-hole first."
     exit 1
 fi
 
 # Get Pi-hole version
 PIHOLE_VERSION=$(pihole -v | grep -oP "v\K[0-9]+\.[0-9]+")
 if [[ -z "$PIHOLE_VERSION" ]]; then
-    echo "Could not determine Pi-hole version."
+    log_error "Could not determine Pi-hole version."
     exit 1
 fi
 
 # Check if version is 6.x
 if [[ ! "$PIHOLE_VERSION" =~ ^6\. ]]; then
-    echo "This mod (v${MOD_VERSION}) is designed for Pi-hole ${REQUIRED_PIHOLE_VERSION}. Your version is $PIHOLE_VERSION"
+    log_error "This mod (v${MOD_VERSION}) is designed for Pi-hole ${REQUIRED_PIHOLE_VERSION}. Your version is $PIHOLE_VERSION"
     exit 1
 fi
 
@@ -30,29 +41,43 @@ DB_DIR="/etc/pihole/pihole-6-speedtest"
 
 # Verify SCRIPT_DIR is set
 if [ -z "$SCRIPT_DIR" ]; then
-    echo "Error: SCRIPT_DIR environment variable is not set"
+    log_error "SCRIPT_DIR environment variable is not set"
     exit 1
 fi
 
 # Install speedtest CLI if not present
 if ! command -v speedtest &> /dev/null; then
     echo "Installing speedtest CLI..."
-    curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
-    sudo apt-get install speedtest
+    if ! curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash; then
+        log_error "Failed to add speedtest repository"
+    fi
+    if ! sudo apt-get install -y speedtest; then
+        log_error "Failed to install speedtest CLI"
+    fi
 fi
 
 # Create database directory with proper permissions
 if [ ! -d "$DB_DIR" ]; then
     echo "Creating database directory..."
-    sudo mkdir -p "$DB_DIR"
-    sudo chown www-data:www-data "$DB_DIR"
-    sudo chmod 755 "$DB_DIR"
+    if ! sudo mkdir -p "$DB_DIR"; then
+        log_error "Failed to create database directory"
+    fi
+    if ! sudo chown www-data:www-data "$DB_DIR"; then
+        log_error "Failed to set database directory ownership"
+    fi
+    if ! sudo chmod 755 "$DB_DIR"; then
+        log_error "Failed to set database directory permissions"
+    fi
 fi
 
 # Copy speedtest script
 echo "Installing speedtest script..."
-sudo cp "$SCRIPT_DIR/speedtest.sh" /usr/local/bin/pihole-6-speedtest
-sudo chmod +x /usr/local/bin/pihole-6-speedtest
+if ! sudo cp "$SCRIPT_DIR/speedtest.sh" /usr/local/bin/pihole-6-speedtest; then
+    log_error "Failed to copy speedtest script"
+fi
+if ! sudo chmod +x /usr/local/bin/pihole-6-speedtest; then
+    log_error "Failed to set speedtest script permissions"
+fi
 
 # Find Pi-hole web interface directory
 if [ ! -d "$WEB_DIR" ]; then
@@ -68,17 +93,24 @@ if [ ! -d "$WEB_DIR" ]; then
 fi
 
 if [ ! -d "$WEB_DIR" ]; then
-    echo "Error: Could not find Pi-hole web interface directory"
-    echo "Please ensure Pi-hole is properly installed"
+    log_error "Could not find Pi-hole web interface directory"
     exit 1
 fi
 
 # Create web interface files
 echo "Installing web interface files..."
-sudo mkdir -p "$WEB_DIR/scripts/js/"
-sudo mkdir -p "$WEB_DIR/style/"
-sudo cp "$SCRIPT_DIR/speedtest.js" "$WEB_DIR/scripts/js/"
-sudo cp "$SCRIPT_DIR/speedtest.css" "$WEB_DIR/style/"
+if ! sudo mkdir -p "$WEB_DIR/scripts/js/"; then
+    log_error "Failed to create JavaScript directory"
+fi
+if ! sudo mkdir -p "$WEB_DIR/style/"; then
+    log_error "Failed to create style directory"
+fi
+if ! sudo cp "$SCRIPT_DIR/speedtest.js" "$WEB_DIR/scripts/js/"; then
+    log_error "Failed to copy JavaScript file"
+fi
+if ! sudo cp "$SCRIPT_DIR/speedtest.css" "$WEB_DIR/style/"; then
+    log_error "Failed to copy CSS file"
+fi
 
 # Find index file
 INDEX_FILE=""
@@ -91,25 +123,33 @@ for file in "index.php" "index.lp" "index.html"; do
 done
 
 if [ -z "$INDEX_FILE" ]; then
-    echo "Error: Could not find index file in web interface directory"
+    log_error "Could not find index file in web interface directory"
     exit 1
 fi
 
 # Add speedtest widget to dashboard
 if ! grep -q "speedtest" "$INDEX_FILE"; then
     echo "Adding speedtest widget to dashboard..."
+    WIDGET_ADDED=0
     # Try to find a good insertion point
     if grep -q "<div class=\"row\">" "$INDEX_FILE"; then
-        sudo sed -i '/<div class="row">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE"
-        sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"
+        if sudo sed -i '/<div class="row">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"; then
+            WIDGET_ADDED=1
+        fi
     elif grep -q "<div class=\"content-wrapper\">" "$INDEX_FILE"; then
-        sudo sed -i '/<div class="content-wrapper">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE"
-        sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"
+        if sudo sed -i '/<div class="content-wrapper">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"; then
+            WIDGET_ADDED=1
+        fi
     elif grep -q "<div class=\"container-fluid\">" "$INDEX_FILE"; then
-        sudo sed -i '/<div class="container-fluid">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE"
-        sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"
-    else
-        echo "Warning: Could not find suitable insertion point for widget"
+        if sudo sed -i '/<div class="container-fluid">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"; then
+            WIDGET_ADDED=1
+        fi
+    fi
+    if [ $WIDGET_ADDED -eq 0 ]; then
+        log_error "Could not add speedtest widget to dashboard"
         echo "Please check the file structure of $INDEX_FILE"
     fi
 fi
@@ -128,57 +168,98 @@ if [ -n "$SETTINGS_FILE" ]; then
     # Add speedtest settings to system settings
     if ! grep -q "speedtest" "$SETTINGS_FILE"; then
         echo "Adding speedtest settings..."
+        SETTINGS_ADDED=0
         # Try to find a good insertion point
         if grep -q "<div class=\"row\">" "$SETTINGS_FILE"; then
-            sudo sed -i '/<div class="row">/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE"
-            sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="col-md-12">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Settings</h3>\n        </div>\n        <div class="box-body">\n          <div class="form-group">\n            <label for="speedtest-interval">Test Interval (hours)</label>\n            <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n          </div>\n          <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n        </div>\n      </div>\n    </div>' "$SETTINGS_FILE"
+            if sudo sed -i '/<div class="row">/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE" && \
+               sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="col-md-12">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Settings</h3>\n        </div>\n        <div class="box-body">\n          <div class="form-group">\n            <label for="speedtest-interval">Test Interval (hours)</label>\n            <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n          </div>\n          <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n        </div>\n      </div>\n    </div>' "$SETTINGS_FILE"; then
+                SETTINGS_ADDED=1
+            fi
         elif grep -q "<div class=\"content-wrapper\">" "$SETTINGS_FILE"; then
-            sudo sed -i '/<div class="content-wrapper">/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE"
-            sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="col-md-12">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Settings</h3>\n        </div>\n        <div class="box-body">\n          <div class="form-group">\n            <label for="speedtest-interval">Test Interval (hours)</label>\n            <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n          </div>\n          <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n        </div>\n      </div>\n    </div>' "$SETTINGS_FILE"
+            if sudo sed -i '/<div class="content-wrapper">/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE" && \
+               sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="col-md-12">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Settings</h3>\n        </div>\n        <div class="box-body">\n          <div class="form-group">\n            <label for="speedtest-interval">Test Interval (hours)</label>\n            <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n          </div>\n          <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n        </div>\n      </div>\n    </div>' "$SETTINGS_FILE"; then
+                SETTINGS_ADDED=1
+            fi
         elif grep -q "<div class=\"container-fluid\">" "$SETTINGS_FILE"; then
-            sudo sed -i '/<div class="container-fluid">/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE"
-            sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="col-md-12">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Settings</h3>\n        </div>\n        <div class="box-body">\n          <div class="form-group">\n            <label for="speedtest-interval">Test Interval (hours)</label>\n            <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n          </div>\n          <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n        </div>\n      </div>\n    </div>' "$SETTINGS_FILE"
-        else
-            echo "Warning: Could not find suitable insertion point for settings"
+            if sudo sed -i '/<div class="container-fluid">/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE" && \
+               sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="col-md-12">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Settings</h3>\n        </div>\n        <div class="box-body">\n          <div class="form-group">\n            <label for="speedtest-interval">Test Interval (hours)</label>\n            <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n          </div>\n          <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n        </div>\n      </div>\n    </div>' "$SETTINGS_FILE"; then
+                SETTINGS_ADDED=1
+            fi
+        fi
+        if [ $SETTINGS_ADDED -eq 0 ]; then
+            log_error "Could not add speedtest settings"
             echo "Please check the file structure of $SETTINGS_FILE"
         fi
     fi
 else
-    echo "Warning: Could not find settings file"
+    log_error "Could not find settings file"
 fi
 
 # Add speedtest script to page
 if ! grep -q "speedtest.js" "$INDEX_FILE"; then
     echo "Adding speedtest script to page..."
+    SCRIPT_ADDED=0
     if grep -q "</body>" "$INDEX_FILE"; then
-        sudo sed -i '/<\/body>/ i <!-- Add Speedtest Script -->' "$INDEX_FILE"
-        sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"
+        if sudo sed -i '/<\/body>/ i <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
     elif grep -q "<!-- REQUIRED JS SCRIPTS -->" "$INDEX_FILE"; then
-        sudo sed -i '/<!-- REQUIRED JS SCRIPTS -->/ a <!-- Add Speedtest Script -->' "$INDEX_FILE"
-        sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"
+        if sudo sed -i '/<!-- REQUIRED JS SCRIPTS -->/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
     elif grep -q "<!-- Scripts -->" "$INDEX_FILE"; then
-        sudo sed -i '/<!-- Scripts -->/ a <!-- Add Speedtest Script -->' "$INDEX_FILE"
-        sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"
-    else
-        echo "Warning: Could not find suitable insertion point for script"
+        if sudo sed -i '/<!-- Scripts -->/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    fi
+    if [ $SCRIPT_ADDED -eq 0 ]; then
+        log_error "Could not add speedtest script to page"
         echo "Please check the file structure of $INDEX_FILE"
     fi
 fi
 
 # Set proper permissions
 echo "Setting proper permissions..."
-sudo chown -R www-data:www-data "$WEB_DIR/scripts/js/speedtest.js"
-sudo chown -R www-data:www-data "$WEB_DIR/style/speedtest.css"
-sudo chmod 644 "$WEB_DIR/scripts/js/speedtest.js"
-sudo chmod 644 "$WEB_DIR/style/speedtest.css"
+if ! sudo chown -R www-data:www-data "$WEB_DIR/scripts/js/speedtest.js"; then
+    log_error "Failed to set JavaScript file ownership"
+fi
+if ! sudo chown -R www-data:www-data "$WEB_DIR/style/speedtest.css"; then
+    log_error "Failed to set CSS file ownership"
+fi
+if ! sudo chmod 644 "$WEB_DIR/scripts/js/speedtest.js"; then
+    log_error "Failed to set JavaScript file permissions"
+fi
+if ! sudo chmod 644 "$WEB_DIR/style/speedtest.css"; then
+    log_error "Failed to set CSS file permissions"
+fi
 
 # Restart Pi-hole FTL service
 echo "Restarting Pi-hole FTL service..."
 if command -v systemctl &> /dev/null; then
-    sudo systemctl restart pihole-FTL
+    if ! sudo systemctl restart pihole-FTL; then
+        log_error "Failed to restart Pi-hole FTL service"
+    fi
 else
-    sudo service pihole-FTL restart
+    if ! sudo service pihole-FTL restart; then
+        log_error "Failed to restart Pi-hole FTL service"
+    fi
 fi
 
-echo "Speedtest mod installed successfully!"
-echo "Please refresh your Pi-hole web interface to see the changes."
+# Print installation summary
+echo
+if [ $INSTALL_ERRORS -eq 0 ]; then
+    echo "Speedtest mod installed successfully!"
+    echo "Please refresh your Pi-hole web interface to see the changes."
+else
+    echo "Speedtest mod installation completed with $INSTALL_ERRORS error(s):"
+    for error in "${ERROR_MESSAGES[@]}"; do
+        echo "- $error"
+    done
+    echo
+    echo "Please check the errors above and try to resolve them manually."
+    echo "You may need to refresh your Pi-hole web interface to see partial changes."
+    exit 1
+fi

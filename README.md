@@ -17,6 +17,7 @@ A Pi-hole extension that adds speedtest functionality directly to your Pi-hole d
 - Easy installation and configuration
 - Automatic web interface detection
 - Enhanced error handling and user feedback
+- Detailed installation progress and error reporting
 
 ## Requirements
 - Pi-hole v6.x
