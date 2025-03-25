@@ -99,14 +99,18 @@ fi
 if ! grep -q "speedtest" "$INDEX_FILE"; then
     echo "Adding speedtest widget to dashboard..."
     # Try to find a good insertion point
-    if grep -q "<!-- Content Wrapper. Contains page content -->" "$INDEX_FILE"; then
-        sudo sed -i '/<!-- Content Wrapper. Contains page content -->/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE"
+    if grep -q "<div class=\"row\">" "$INDEX_FILE"; then
+        sudo sed -i '/<div class="row">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE"
         sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"
     elif grep -q "<div class=\"content-wrapper\">" "$INDEX_FILE"; then
         sudo sed -i '/<div class="content-wrapper">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE"
         sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"
+    elif grep -q "<div class=\"container-fluid\">" "$INDEX_FILE"; then
+        sudo sed -i '/<div class="container-fluid">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE"
+        sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"
     else
         echo "Warning: Could not find suitable insertion point for widget"
+        echo "Please check the file structure of $INDEX_FILE"
     fi
 fi
 
@@ -125,14 +129,18 @@ if [ -n "$SETTINGS_FILE" ]; then
     if ! grep -q "speedtest" "$SETTINGS_FILE"; then
         echo "Adding speedtest settings..."
         # Try to find a good insertion point
-        if grep -q "<!-- Content Wrapper. Contains page content -->" "$SETTINGS_FILE"; then
-            sudo sed -i '/<!-- Content Wrapper. Contains page content -->/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE"
-            sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="box box-primary">\n      <div class="box-header with-border">\n        <h3 class="box-title">Speedtest Settings</h3>\n      </div>\n      <div class="box-body">\n        <div class="form-group">\n          <label for="speedtest-interval">Test Interval (hours)</label>\n          <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n        </div>\n        <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n      </div>\n    </div>' "$SETTINGS_FILE"
+        if grep -q "<div class=\"row\">" "$SETTINGS_FILE"; then
+            sudo sed -i '/<div class="row">/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE"
+            sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="col-md-12">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Settings</h3>\n        </div>\n        <div class="box-body">\n          <div class="form-group">\n            <label for="speedtest-interval">Test Interval (hours)</label>\n            <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n          </div>\n          <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n        </div>\n      </div>\n    </div>' "$SETTINGS_FILE"
         elif grep -q "<div class=\"content-wrapper\">" "$SETTINGS_FILE"; then
             sudo sed -i '/<div class="content-wrapper">/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE"
-            sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="box box-primary">\n      <div class="box-header with-border">\n        <h3 class="box-title">Speedtest Settings</h3>\n      </div>\n      <div class="box-body">\n        <div class="form-group">\n          <label for="speedtest-interval">Test Interval (hours)</label>\n          <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n        </div>\n        <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n      </div>\n    </div>' "$SETTINGS_FILE"
+            sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="col-md-12">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Settings</h3>\n        </div>\n        <div class="box-body">\n          <div class="form-group">\n            <label for="speedtest-interval">Test Interval (hours)</label>\n            <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n          </div>\n          <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n        </div>\n      </div>\n    </div>' "$SETTINGS_FILE"
+        elif grep -q "<div class=\"container-fluid\">" "$SETTINGS_FILE"; then
+            sudo sed -i '/<div class="container-fluid">/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE"
+            sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="col-md-12">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Settings</h3>\n        </div>\n        <div class="box-body">\n          <div class="form-group">\n            <label for="speedtest-interval">Test Interval (hours)</label>\n            <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n          </div>\n          <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n        </div>\n      </div>\n    </div>' "$SETTINGS_FILE"
         else
             echo "Warning: Could not find suitable insertion point for settings"
+            echo "Please check the file structure of $SETTINGS_FILE"
         fi
     fi
 else
@@ -148,8 +156,12 @@ if ! grep -q "speedtest.js" "$INDEX_FILE"; then
     elif grep -q "<!-- REQUIRED JS SCRIPTS -->" "$INDEX_FILE"; then
         sudo sed -i '/<!-- REQUIRED JS SCRIPTS -->/ a <!-- Add Speedtest Script -->' "$INDEX_FILE"
         sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"
+    elif grep -q "<!-- Scripts -->" "$INDEX_FILE"; then
+        sudo sed -i '/<!-- Scripts -->/ a <!-- Add Speedtest Script -->' "$INDEX_FILE"
+        sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"
     else
         echo "Warning: Could not find suitable insertion point for script"
+        echo "Please check the file structure of $INDEX_FILE"
     fi
 fi
 
