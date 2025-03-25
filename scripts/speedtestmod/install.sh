@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version information
-MOD_VERSION="2.1.1"
+MOD_VERSION="2.1.2"
 REQUIRED_PIHOLE_VERSION="6.x"
 
 # Initialize error tracking

@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2024-03-25
+
+### Added
+- Added uninstall script for clean removal of the mod
+- Added better error handling during uninstallation
+- Added automatic cleanup of all mod files and configurations
+
+### Changed
+- Improved script insertion points for Pi-hole 6's web interface
+- Enhanced error messages and user feedback
+- Updated installation and uninstallation documentation
+
+### Fixed
+- Fixed widget removal during uninstallation
+- Fixed script reference cleanup in index.lp
+- Fixed database directory cleanup
+
 ## [2.1.1] - 2024-03-25
 
 ### Changed

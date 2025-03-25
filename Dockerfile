@@ -4,9 +4,9 @@ FROM pihole/pihole:latest
 RUN curl -sSL https://github.com/saqibj/pihole-6-speedtest/raw/main/mod | sudo bash
 
 # Set the default tag
-LABEL maintainer="Your Name <your.email@example.com>"
-LABEL description="Pi-hole with Speedtest Mod"
-LABEL version="2.1.1"
+LABEL maintainer="saqibj <https://github.com/saqibj>"
+LABEL description="Pi-Hole 6.x with Speedtest Mod"
+LABEL version="2.1.2"
 LABEL pihole_version="6.x"
 
 # Copy mod files

@@ -18,6 +18,7 @@ A Pi-hole extension that adds speedtest functionality directly to your Pi-hole d
 - Automatic web interface detection
 - Enhanced error handling and user feedback
 - Detailed installation progress and error reporting
+- Clean uninstallation process
 
 ## Requirements
 - Pi-hole v6.x
@@ -61,6 +62,61 @@ docker run -d \
     ghcr.io/saqibj/pihole-6-speedtest:pihole-6
 ```
 
+## Uninstallation
+
+### Quick Uninstall
+
+```bash
+curl -sSL https://raw.githubusercontent.com/saqibj/pihole-6-speedtest/main/scripts/speedtestmod/uninstall.sh | sudo bash
+```
+
+### Manual Uninstallation
+
+1. Navigate to the mod directory:
+```bash
+cd pihole-6-speedtest
+```
+
+2. Run the uninstallation script:
+```bash
+sudo bash scripts/speedtestmod/uninstall.sh
+```
+
+The uninstallation script will:
+- Remove all mod files and configurations
+- Clean up web interface modifications
+- Remove the speedtest database
+- Remove the cron job
+- Restart Pi-hole FTL service
+
+If you encounter any errors during uninstallation, the script will provide detailed information about what went wrong and how to resolve it.
+
+### Manual Cleanup
+
+If the automatic uninstallation fails, you can manually remove the mod:
+
+1. Remove the mod files:
+```bash
+sudo rm /var/www/html/admin/scripts/js/speedtest.js
+sudo rm /var/www/html/admin/style/speedtest.css
+sudo rm /usr/local/bin/pihole-6-speedtest
+```
+
+2. Remove the database directory:
+```bash
+sudo rm -rf /etc/pihole/pihole-6-speedtest
+```
+
+3. Remove the cron job:
+```bash
+sudo rm /etc/cron.d/pihole-6-speedtest
+```
+
+4. Restart Pi-hole FTL:
+```bash
+sudo systemctl restart pihole-FTL
+```
+
 ## Usage
 
 ### Running a Speedtest
@@ -100,14 +156,6 @@ pihole-6-speedtest/
 │       ├── speedtest.js   # Web interface JavaScript
 │       └── speedtest.css  # Web interface styles
 └── README.md
-```
-
-## Uninstallation
-
-To remove the speedtest mod:
-
-```bash
-sudo ./mod -u
 ```
 
 ## Contributing
