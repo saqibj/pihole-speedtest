@@ -83,10 +83,10 @@ fi
 if [ ! -d "$WEB_DIR" ]; then
     echo "Looking for Pi-hole web interface directory..."
     # Try common locations
-    for dir in "/var/www/html/admin" "/var/www/html/pihole" "/var/www/pihole" "/var/www/html"; do
+    for dir in "/var/www/html/admin" "/var/www/html/pihole" "/var/www/pihole" "/var/www/html" "/var/www/html/pihole/admin" "/var/www/html/pihole"; do
         if [ -d "$dir" ]; then
             WEB_DIR="$dir"
-            echo "Found web interface at: $WEB_DIR"
+            log_info "Found web interface at: $WEB_DIR"
             break
         fi
     done
@@ -114,10 +114,10 @@ fi
 
 # Find index file
 INDEX_FILE=""
-for file in "index.php" "index.lp" "index.html"; do
+for file in "index.php" "index.lp" "index.html" "index.tlp"; do
     if [ -f "$WEB_DIR/$file" ]; then
         INDEX_FILE="$WEB_DIR/$file"
-        echo "Found index file: $INDEX_FILE"
+        log_info "Found index file: $INDEX_FILE"
         break
     fi
 done
@@ -238,25 +238,28 @@ echo "Restarting Pi-hole FTL service..."
 if command -v systemctl &> /dev/null; then
     if ! sudo systemctl restart pihole-FTL; then
         log_error "Failed to restart Pi-hole FTL service"
+    else
+        log_info "Successfully restarted Pi-hole FTL service"
     fi
 else
     if ! sudo service pihole-FTL restart; then
         log_error "Failed to restart Pi-hole FTL service"
+    else
+        log_info "Successfully restarted Pi-hole FTL service"
     fi
 fi
 
 # Print installation summary
 echo
 if [ $INSTALL_ERRORS -eq 0 ]; then
-    echo "Speedtest mod installed successfully!"
-    echo "Please refresh your Pi-hole web interface to see the changes."
+    log_info "Speedtest mod installed successfully!"
+    log_info "Please refresh your Pi-hole web interface to see the changes."
 else
-    echo "Speedtest mod installation completed with $INSTALL_ERRORS error(s):"
+    log_error "Speedtest mod installation completed with $INSTALL_ERRORS error(s):"
     for error in "${ERROR_MESSAGES[@]}"; do
-        echo "- $error"
+        log_error "- $error"
     done
-    echo
-    echo "Please check the errors above and try to resolve them manually."
-    echo "You may need to refresh your Pi-hole web interface to see partial changes."
+    log_info "Please check the errors above and try to resolve them manually."
+    log_info "You may need to refresh your Pi-hole web interface to see partial changes."
     exit 1
 fi
