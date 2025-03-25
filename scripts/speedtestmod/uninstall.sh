@@ -132,24 +132,20 @@ fi
 
 # Remove speedtest widget from dashboard
 log_info "Checking for speedtest widget in dashboard..."
-# Check for various patterns that might indicate the speedtest widget
+# First, let's check the content around the widget
 if grep -q "speedtest" "$INDEX_FILE"; then
     log_debug "Found speedtest references in index file"
-    # Try to find the widget section
-    if grep -q "<!-- Add Speedtest Widget -->" "$INDEX_FILE"; then
-        log_debug "Found standard widget marker, removing..."
-        if ! sudo sed -i '/<!-- Add Speedtest Widget -->/,/<!-- \/\.\/col -->\n<\/div>/d' "$INDEX_FILE"; then
-            log_error "Failed to remove speedtest widget (standard pattern)"
-        else
-            log_info "Successfully removed speedtest widget (standard pattern)"
-        fi
+    # Create a temporary file for the new content
+    TEMP_FILE=$(mktemp)
+    
+    # Remove the widget section while preserving the rest of the content
+    if ! awk '/<!-- Add Speedtest Widget -->/{p=1;next}p&&/<!-- \/\.\/col -->/{p=0;next}!p' "$INDEX_FILE" > "$TEMP_FILE"; then
+        log_error "Failed to remove speedtest widget (standard pattern)"
     else
-        log_debug "Trying alternative widget patterns..."
-        # Try to find and remove the widget section using alternative patterns
-        if ! sudo sed -i '/<div class="col-md-6">/,/<\/div>/d' "$INDEX_FILE"; then
-            log_error "Failed to remove speedtest widget (alternative pattern)"
-        else
-            log_info "Successfully removed speedtest widget (alternative pattern)"
+        log_info "Successfully removed speedtest widget (standard pattern)"
+        # Move the temporary file back to the original
+        if ! sudo mv "$TEMP_FILE" "$INDEX_FILE"; then
+            log_error "Failed to update index file"
         fi
     fi
 else
@@ -160,10 +156,13 @@ fi
 log_info "Checking for speedtest script in page..."
 if grep -q "speedtest.js" "$INDEX_FILE"; then
     log_debug "Found speedtest script reference, removing..."
-    # Try multiple patterns for script removal
-    if ! sudo sed -i '/<!-- Add Speedtest Script -->/,/<script src="<?=pihole.fileversion('\''scripts\/js\/speedtest.js'\'')?>">/d' "$INDEX_FILE"; then
+    # Create a temporary file for the new content
+    TEMP_FILE=$(mktemp)
+    
+    # Remove the script section while preserving the rest of the content
+    if ! awk '/<!-- Add Speedtest Script -->/{p=1;next}p&&/<script src="<?=pihole.fileversion('\''scripts\/js\/speedtest.js'\'')?>">/{p=0;next}!p' "$INDEX_FILE" > "$TEMP_FILE"; then
         log_debug "Failed to remove script (standard pattern), trying alternative..."
-        if ! sudo sed -i '/<script src="scripts\/js\/speedtest.js">/d' "$INDEX_FILE"; then
+        if ! grep -v 'speedtest.js' "$INDEX_FILE" > "$TEMP_FILE"; then
             log_error "Failed to remove speedtest script reference"
         else
             log_info "Successfully removed speedtest script reference (alternative pattern)"
@@ -171,8 +170,40 @@ if grep -q "speedtest.js" "$INDEX_FILE"; then
     else
         log_info "Successfully removed speedtest script reference (standard pattern)"
     fi
+    
+    # Move the temporary file back to the original
+    if ! sudo mv "$TEMP_FILE" "$INDEX_FILE"; then
+        log_error "Failed to update index file"
+    fi
 else
     log_debug "Speedtest script reference not found in page"
+fi
+
+# Remove speedtest settings from settings page
+log_info "Checking for speedtest settings in settings page..."
+SETTINGS_FILE="$WEB_DIR/settings.php"
+if [ -f "$SETTINGS_FILE" ]; then
+    log_debug "Found settings file, checking for speedtest settings..."
+    if grep -q "speedtest" "$SETTINGS_FILE"; then
+        log_debug "Found speedtest settings, removing..."
+        # Create a temporary file for the new content
+        TEMP_FILE=$(mktemp)
+        
+        # Remove the speedtest settings section while preserving the rest of the content
+        if ! awk '/<!-- Add Speedtest Settings -->/{p=1;next}p&&/<!-- \/\.\/speedtest-settings -->/{p=0;next}!p' "$SETTINGS_FILE" > "$TEMP_FILE"; then
+            log_error "Failed to remove speedtest settings"
+        else
+            log_info "Successfully removed speedtest settings"
+            # Move the temporary file back to the original
+            if ! sudo mv "$TEMP_FILE" "$SETTINGS_FILE"; then
+                log_error "Failed to update settings file"
+            fi
+        fi
+    else
+        log_debug "No speedtest settings found in settings file"
+    fi
+else
+    log_debug "Settings file not found at $SETTINGS_FILE"
 fi
 
 # Remove database directory
@@ -222,7 +253,7 @@ echo
 if [ $UNINSTALL_ERRORS -eq 0 ]; then
     log_info "Speedtest mod uninstalled successfully!"
     log_info "Please refresh your Pi-hole web interface to see the changes."
-    log_info "If you still see the speedtest widget, please try clearing your browser cache."
+    log_info "If you still see the speedtest widget or settings, please try clearing your browser cache."
 else
     log_error "Speedtest mod uninstallation completed with $UNINSTALL_ERRORS error(s):"
     for error in "${ERROR_MESSAGES[@]}"; do
