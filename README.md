@@ -6,6 +6,10 @@
 [![Docker](https://img.shields.io/docker/pulls/saqibj/pihole-speedtest)](https://hub.docker.com/r/saqibj/pihole-speedtest)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/saqibj/pihole-speedtest/blob/main/LICENSE)
 [![Pi-hole Version](https://img.shields.io/badge/Pi--hole-6.x-blue)](https://pi-hole.net/)
+[![Shell Script](https://img.shields.io/badge/Shell_Script-%23121011.svg?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![PHP](https://img.shields.io/badge/PHP-777BB4?logo=php&logoColor=white)](https://www.php.net/)
+[![SQLite](https://img.shields.io/badge/SQLite-07405E?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 
 A Pi-hole extension that adds speedtest functionality directly to your Pi-hole dashboard. This mod allows you to monitor your network speed over time, run tests on demand, and view historical data through a beautiful web interface.
 
