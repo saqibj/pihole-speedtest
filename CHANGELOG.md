@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2024-03-25
+
+### Changed
+- Added more script insertion points for Pi-hole 6's .lp files
+- Improved script insertion error handling
+- Enhanced manual intervention guidance
+
+### Fixed
+- Script insertion failures in Pi-hole 6's web interface
+- Added support for more common script locations in .lp files
+- Better handling of file modification failures
+
+### Added
+- Manual script insertion instructions when automatic insertion fails
+- Support for additional script insertion points:
+  - `<!-- Footer -->`
+  - `<script src="scripts/pi-hole/js/"`
+  - `<script src="scripts/pi-hole/js/scripts.js"`
+
 ## [2.1.1] - 2024-03-24
 
 ### Changed

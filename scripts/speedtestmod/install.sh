@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version information
-MOD_VERSION="2.1.1"
+MOD_VERSION="2.1.2"
 REQUIRED_PIHOLE_VERSION="6.x"
 
 # Initialize error tracking
@@ -199,6 +199,7 @@ fi
 if ! grep -q "speedtest.js" "$INDEX_FILE"; then
     echo "Adding speedtest script to page..."
     SCRIPT_ADDED=0
+    # Try to find a good insertion point
     if grep -q "</body>" "$INDEX_FILE"; then
         if sudo sed -i '/<\/body>/ i <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
            sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
@@ -214,10 +215,27 @@ if ! grep -q "speedtest.js" "$INDEX_FILE"; then
            sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
             SCRIPT_ADDED=1
         fi
+    elif grep -q "<!-- Footer -->" "$INDEX_FILE"; then
+        if sudo sed -i '/<!-- Footer -->/ i <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\// a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
+    elif grep -q "<script src=\"scripts/pi-hole/js/scripts.js\"" "$INDEX_FILE"; then
+        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/scripts.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+            SCRIPT_ADDED=1
+        fi
     fi
     if [ $SCRIPT_ADDED -eq 0 ]; then
         log_error "Could not add speedtest script to page"
         echo "Please check the file structure of $INDEX_FILE"
+        echo "You can manually add the following line to the file:"
+        echo '    <script src="scripts/js/speedtest.js"></script>'
     fi
 fi
 
