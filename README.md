@@ -67,7 +67,7 @@ docker run -d \
 ### Quick Uninstall
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/saqibj/pihole-6-speedtest/main/uninstall | sudo bash
+curl -sSL https://raw.githubusercontent.com/saqibj/pihole-6-speedtest/main/scripts/speedtestmod/uninstall.sh | sudo bash
 ```
 
 ### Manual Uninstallation
@@ -79,7 +79,7 @@ cd pihole-6-speedtest
 
 2. Run the uninstallation script:
 ```bash
-sudo ./uninstall
+sudo bash scripts/speedtestmod/uninstall.sh
 ```
 
 The uninstallation script will:
