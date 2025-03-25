@@ -3,13 +3,12 @@
 ![Speedtest Chart](https://raw.githubusercontent.com/arevindh/AdminLTE/master/img/st-chart.png)
 
 [![Version](https://img.shields.io/badge/version-2.1.3-blue.svg)](https://github.com/saqibj/pihole-speedtest/releases)
-[![Docker](https://img.shields.io/docker/pulls/saqibj/pihole-speedtest)](https://hub.docker.com/r/saqibj/pihole-speedtest)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/saqibj/pihole-speedtest/blob/main/LICENSE)
 [![Pi-hole Version](https://img.shields.io/badge/Pi--hole-6.x-blue)](https://pi-hole.net/)
 [![Shell Script](https://img.shields.io/badge/Shell_Script-%23121011.svg?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![PHP](https://img.shields.io/badge/PHP-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-07405E?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/saqibj/pihole-speedtest/blob/main/LICENSE)
 
 A Pi-hole extension that adds speedtest functionality directly to your Pi-hole dashboard. This mod allows you to monitor your network speed over time, run tests on demand, and view historical data through a beautiful web interface.
 
@@ -153,29 +152,3 @@ sudo systemctl restart pihole-FTL
 ## File Structure
 
 ```
-pihole-speedtest/
-├── mod                    # Main installation script
-├── test                   # Speedtest runner script
-├── scripts/
-│   └── speedtestmod/
-│       ├── install.sh     # Installation script
-│       ├── speedtest.sh   # Speedtest runner
-│       ├── speedtest.js   # Web interface JavaScript
-│       └── speedtest.css  # Web interface styles
-└── README.md
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Credits
-
-- [Pi-hole](https://pi-hole.net/) - The core DNS server
-- [Ookla Speedtest CLI](https://www.speedtest.net/apps/cli) - The speedtest tool
-- [Chart.js](https://www.chartjs.org/) - For beautiful charts
-- [Original Pi-hole Speedtest Mod](https://github.com/arevindh/pihole-speedtest) - The original project by @arevindh
