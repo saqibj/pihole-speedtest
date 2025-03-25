@@ -2,7 +2,10 @@
 
 ![Speedtest Chart](https://raw.githubusercontent.com/arevindh/AdminLTE/master/img/st-chart.png)
 
-[![Join the chat at https://gitter.im/pihole-6-speedtest/community](https://badges.gitter.im/pihole-6-speedtest/community.svg)](https://gitter.im/pihole-6-speedtest/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/TW9TfyM) [![Docker Build](https://github.com/saqibj/pihole-speedtest/actions/workflows/publish.yml/badge.svg)](https://github.com/saqibj/pihole-speedtest/actions/workflows/publish.yml)
+[![Version](https://img.shields.io/badge/version-2.1.3-blue.svg)](https://github.com/saqibj/pihole-speedtest/releases)
+[![Docker](https://img.shields.io/docker/pulls/saqibj/pihole-speedtest)](https://hub.docker.com/r/saqibj/pihole-speedtest)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/saqibj/pihole-speedtest/blob/main/LICENSE)
+[![Pi-hole Version](https://img.shields.io/badge/Pi--hole-6.x-blue)](https://pi-hole.net/)
 
 A Pi-hole extension that adds speedtest functionality directly to your Pi-hole dashboard. This mod allows you to monitor your network speed over time, run tests on demand, and view historical data through a beautiful web interface.
 
