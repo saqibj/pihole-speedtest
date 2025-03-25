@@ -79,7 +79,7 @@ cd pihole-6-speedtest
 
 2. Run the uninstallation script:
 ```bash
-sudo bash scripts/speedtestmod/uninstall.sh
+sudo ./uninstall
 ```
 
 The uninstallation script will:
