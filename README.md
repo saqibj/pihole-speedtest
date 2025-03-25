@@ -2,7 +2,7 @@
 
 ![Speedtest Chart](https://raw.githubusercontent.com/arevindh/AdminLTE/master/img/st-chart.png)
 
-[![Join the chat at https://gitter.im/pihole-6-speedtest/community](https://badges.gitter.im/pihole-6-speedtest/community.svg)](https://gitter.im/pihole-6-speedtest/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/TW9TfyM) [![Docker Build](https://github.com/saqibj/pihole-6-speedtest/actions/workflows/publish.yml/badge.svg)](https://github.com/saqibj/pihole-6-speedtest/actions/workflows/publish.yml)
+[![Join the chat at https://gitter.im/pihole-6-speedtest/community](https://badges.gitter.im/pihole-6-speedtest/community.svg)](https://gitter.im/pihole-6-speedtest/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/TW9TfyM) [![Docker Build](https://github.com/saqibj/pihole-speedtest/actions/workflows/publish.yml/badge.svg)](https://github.com/saqibj/pihole-speedtest/actions/workflows/publish.yml)
 
 A Pi-hole extension that adds speedtest functionality directly to your Pi-hole dashboard. This mod allows you to monitor your network speed over time, run tests on demand, and view historical data through a beautiful web interface.
 
@@ -30,15 +30,15 @@ A Pi-hole extension that adds speedtest functionality directly to your Pi-hole d
 ### Quick Install
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/saqibj/pihole-6-speedtest/main/mod | sudo bash
+curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/main/mod | sudo bash
 ```
 
 ### Manual Installation
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/saqibj/pihole-6-speedtest.git
-cd pihole-6-speedtest
+git clone https://github.com/saqibj/pihole-speedtest.git
+cd pihole-speedtest
 ```
 
 2. Run the installation script:
@@ -59,7 +59,7 @@ docker run -d \
     -v "$(pwd)/etc-pihole:/etc/pihole" \
     -v "$(pwd)/etc-dnsmasq.d:/etc/dnsmasq.d" \
     --restart=unless-stopped \
-    ghcr.io/saqibj/pihole-6-speedtest:pihole-6
+    ghcr.io/saqibj/pihole-speedtest:pihole-6
 ```
 
 ## Uninstallation
@@ -67,14 +67,14 @@ docker run -d \
 ### Quick Uninstall
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/saqibj/pihole-6-speedtest/main/scripts/speedtestmod/uninstall.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/main/scripts/speedtestmod/uninstall.sh | sudo bash
 ```
 
 ### Manual Uninstallation
 
 1. Navigate to the mod directory:
 ```bash
-cd pihole-6-speedtest
+cd pihole-speedtest
 ```
 
 2. Run the uninstallation script:
@@ -146,7 +146,7 @@ sudo systemctl restart pihole-FTL
 ## File Structure
 
 ```
-pihole-6-speedtest/
+pihole-speedtest/
 ├── mod                    # Main installation script
 ├── test                   # Speedtest runner script
 ├── scripts/
