@@ -104,17 +104,13 @@ DB_DIR="/etc/pihole/pihole-6-speedtest"
 
 # Find web interface directory
 log_info "Looking for Pi-hole web interface directory..."
-if [ ! -d "$WEB_DIR" ]; then
-    log_debug "Default web directory not found, searching in common locations..."
-    # Try common locations
-    for dir in "/var/www/html/admin" "/var/www/html/pihole" "/var/www/pihole" "/var/www/html"; do
-        if [ -d "$dir" ]; then
-            WEB_DIR="$dir"
-            log_info "Found web interface at: $WEB_DIR"
-            break
-        fi
-    done
-fi
+for dir in "/var/www/html/admin" "/var/www/html/pihole" "/var/www/pihole" "/var/www/html" "/var/www/html/pihole/admin" "/var/www/html/pihole"; do
+    if [ -d "$dir" ]; then
+        WEB_DIR="$dir"
+        log_info "Found web interface at: $WEB_DIR"
+        break
+    fi
+done
 
 if [ ! -d "$WEB_DIR" ]; then
     log_error "Could not find Pi-hole web interface directory"
@@ -125,7 +121,7 @@ log_info "Using web interface directory: $WEB_DIR"
 # Find index file
 log_info "Looking for index file..."
 INDEX_FILE=""
-for file in "index.php" "index.lp" "index.html"; do
+for file in "index.php" "index.lp" "index.html" "index.tlp"; do
     if [ -f "$WEB_DIR/$file" ]; then
         INDEX_FILE="$WEB_DIR/$file"
         log_info "Found index file: $INDEX_FILE"
@@ -209,6 +205,9 @@ fi
 # Remove speedtest settings from settings page
 log_info "Checking for speedtest settings in settings page..."
 SETTINGS_FILE="$WEB_DIR/settings.php"
+if [ ! -f "$SETTINGS_FILE" ]; then
+    SETTINGS_FILE="$WEB_DIR/scripts/pi-hole/php/settings.php"
+fi
 if [ -f "$SETTINGS_FILE" ]; then
     log_debug "Found settings file, checking for speedtest settings..."
     if grep -q "speedtest" "$SETTINGS_FILE"; then
