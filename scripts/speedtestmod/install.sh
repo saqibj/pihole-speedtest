@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version information
-MOD_VERSION="2.1.2"
+MOD_VERSION="2.1.1"
 REQUIRED_PIHOLE_VERSION="6.x"
 
 # Initialize error tracking
@@ -131,20 +131,11 @@ fi
 if ! grep -q "speedtest" "$INDEX_FILE"; then
     echo "Adding speedtest widget to dashboard..."
     WIDGET_ADDED=0
-    # Try to find a good insertion point
+    # Try to find a good insertion point in the dashboard layout
     if grep -q "<div class=\"row\">" "$INDEX_FILE"; then
-        if sudo sed -i '/<div class="row">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"; then
-            WIDGET_ADDED=1
-        fi
-    elif grep -q "<div class=\"content-wrapper\">" "$INDEX_FILE"; then
-        if sudo sed -i '/<div class="content-wrapper">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"; then
-            WIDGET_ADDED=1
-        fi
-    elif grep -q "<div class=\"container-fluid\">" "$INDEX_FILE"; then
-        if sudo sed -i '/<div class="container-fluid">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"; then
+        # Insert after the first row of statistics boxes
+        if sudo sed -i '/<div class="col-lg-3 col-sm-6">\n        <!-- small box -->\n        <div class="small-box bg-green no-user-select">/,/<\/div>\n    <!-- \/\.\/col -->\n<\/div>/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-12">\n        <div class="box" id="speedtest-results">\n            <div class="box-header with-border">\n                <h3 class="box-title">Speedtest Results</h3>\n            </div>\n            <div class="box-body">\n                <div id="speedtest-chart"></div>\n            </div>\n            <div class="overlay">\n                <i class="fa fa-sync fa-spin"></i>\n            </div>\n        </div>\n    </div>' "$INDEX_FILE"; then
             WIDGET_ADDED=1
         fi
     fi
@@ -199,80 +190,23 @@ fi
 if ! grep -q "speedtest.js" "$INDEX_FILE"; then
     echo "Adding speedtest script to page..."
     SCRIPT_ADDED=0
-    # Try to find a good insertion point
-    if grep -q "</body>" "$INDEX_FILE"; then
-        if sudo sed -i '/<\/body>/ i <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+    # Try to find a good insertion point for the script
+    if grep -q "<script src=\"<?=pihole.fileversion('scripts/js/charts.js')?>\">" "$INDEX_FILE"; then
+        # Insert after the charts.js script
+        if sudo sed -i '/<script src="<?=pihole.fileversion('\''scripts\/js\/charts.js'\'')?>">/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="<?=pihole.fileversion('\''scripts/js/speedtest.js'\'')?>"></script>' "$INDEX_FILE"; then
             SCRIPT_ADDED=1
         fi
-    elif grep -q "<!-- REQUIRED JS SCRIPTS -->" "$INDEX_FILE"; then
-        if sudo sed -i '/<!-- REQUIRED JS SCRIPTS -->/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+    elif grep -q "<script src=\"<?=pihole.fileversion('scripts/js/index.js')?>\">" "$INDEX_FILE"; then
+        # Insert after the index.js script
+        if sudo sed -i '/<script src="<?=pihole.fileversion('\''scripts\/js\/index.js'\'')?>">/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="<?=pihole.fileversion('\''scripts/js/speedtest.js'\'')?>"></script>' "$INDEX_FILE"; then
             SCRIPT_ADDED=1
         fi
-    elif grep -q "<!-- Scripts -->" "$INDEX_FILE"; then
-        if sudo sed -i '/<!-- Scripts -->/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<!-- Footer -->" "$INDEX_FILE"; then
-        if sudo sed -i '/<!-- Footer -->/ i <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\// a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/scripts.js\"" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/scripts.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/footer.js\"" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/footer.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/custom.js\"" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/custom.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/network.js\"" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/network.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/scripts.js\"" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/scripts.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/gravity.js\"" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/gravity.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/whitelist.js\"" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/whitelist.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/blacklist.js\"" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/blacklist.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/domains.js\"" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/domains.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
-            SCRIPT_ADDED=1
-        fi
-    elif grep -q "<script src=\"scripts/pi-hole/js/ads.js\"" "$INDEX_FILE"; then
-        if sudo sed -i '/<script src="scripts\/pi-hole\/js\/ads.js"/ a <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
-           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"; then
+    elif grep -q "<? mg.include('scripts/lua/footer.lp','r')?>" "$INDEX_FILE"; then
+        # Insert before the footer include
+        if sudo sed -i '/<? mg.include('\''scripts\/lua\/footer.lp'\'','\''r'\'')?>/ i <!-- Add Speedtest Script -->' "$INDEX_FILE" && \
+           sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="<?=pihole.fileversion('\''scripts/js/speedtest.js'\'')?>"></script>' "$INDEX_FILE"; then
             SCRIPT_ADDED=1
         fi
     fi
@@ -280,14 +214,7 @@ if ! grep -q "speedtest.js" "$INDEX_FILE"; then
         log_error "Could not add speedtest script to page"
         echo "Please check the file structure of $INDEX_FILE"
         echo "You can manually add the following line to the file:"
-        echo '    <script src="scripts/js/speedtest.js"></script>'
-        echo
-        echo "Common insertion points to try:"
-        echo "1. Before the closing </body> tag"
-        echo "2. After any existing <script> tag"
-        echo "3. After <!-- REQUIRED JS SCRIPTS -->"
-        echo "4. After <!-- Scripts -->"
-        echo "5. Before <!-- Footer -->"
+        echo '    <script src="<?=pihole.fileversion('\''scripts/js/speedtest.js'\'')?>"></script>'
     fi
 fi
 

@@ -5,82 +5,62 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.2] - 2024-03-25
+## [2.1.1] - 2024-03-25
 
 ### Changed
-- Added more script insertion points for Pi-hole 6's .lp files
-- Improved script insertion error handling
-- Enhanced manual intervention guidance
+- Updated installation script to better handle Pi-hole 6's `.lp` files
+- Improved script insertion points to match Pi-hole 6's web interface structure
+- Added proper handling of Lua template syntax in script tags
+- Updated widget placement to match Pi-hole 6's dashboard layout
+- Added loading overlay spinner to speedtest widget
+- Improved error handling and user feedback during installation
+- Added support for Pi-hole 6's file versioning system
 
 ### Fixed
-- Script insertion failures in Pi-hole 6's web interface
-- Added support for more common script locations in .lp files
-- Better handling of file modification failures
+- Fixed script insertion issues with Pi-hole 6's web interface
+- Fixed widget styling to match Pi-hole 6's design
+- Fixed file permission issues during installation
+- Fixed script path handling for Pi-hole 6
 
 ### Added
-- Manual script insertion instructions when automatic insertion fails
-- Support for additional script insertion points:
-  - `<!-- Footer -->`
-  - `<script src="scripts/pi-hole/js/"`
-  - `<script src="scripts/pi-hole/js/scripts.js"`
-
-## [2.1.1] - 2024-03-24
-
-### Changed
-- Improved error handling and reporting during installation
-- Added detailed error messages for each installation step
-- Enhanced installation success/failure feedback
-- Added proper error tracking and reporting system
-
-### Fixed
-- Installation script now properly reports failures
-- Success message only shows when installation is truly successful
-- Better handling of file modification failures
-- More accurate error reporting for file operations
+- Added support for Pi-hole 6's embedded web server
+- Added better error messages for installation failures
+- Added manual intervention instructions when automatic installation fails
 
 ## [2.1.0] - 2024-03-24
 
-### Added
-- Automatic web interface directory detection
-- Support for multiple Pi-hole web interface locations
-- Flexible file detection for index and settings files
-- Better error handling and user feedback during installation
-
 ### Changed
-- Improved installation script robustness
-- Enhanced error messages and warnings
-- Better handling of file modifications
-- More informative progress messages
+- Updated version number to reflect Pi-hole 6 compatibility
+- Updated installation script to handle Pi-hole 6's file structure
+- Improved error handling in installation script
 
 ### Fixed
-- Installation failures on different Pi-hole web interface paths
-- File permission issues during installation
-- Script insertion point detection
-- Web interface file modification reliability
+- Fixed compatibility issues with Pi-hole 6
+- Fixed file path handling in installation script
 
 ## [2.0.0] - 2024-03-21
 
-### Changed
-- Renamed project to "PiHole 6 Speedtest" for better clarity
-- Updated database directory structure to use project-specific path
-- Improved error handling and permissions management
-- Enhanced installation feedback and progress messages
-- Updated branch structure to use `main` as default branch
-
 ### Added
-- Better error handling for speedtest operations
-- Improved database file permissions
-- More descriptive installation progress messages
-- Proper directory creation with correct permissions
+- Initial release of Pi-hole 6 Speedtest Mod
+- Added speedtest functionality to Pi-hole web interface
+- Added speedtest results visualization
+- Added speedtest settings to Pi-hole dashboard
+- Added automatic speedtest scheduling
+- Added speedtest history tracking
+
+### Changed
+- Updated for Pi-hole 6 compatibility
+- Improved installation process
+- Enhanced error handling
 
 ### Fixed
-- Database directory permissions issues
-- Installation script feedback
-- Branch naming consistency
+- Fixed various installation issues
+- Fixed file permission problems
+- Fixed script loading issues
 
 ### Removed
-- Legacy `master` branch
-- Old project naming references
+- Removed support for older Pi-hole versions
+- Removed deprecated features
 
 ## [1.0.0] - 2024-03-20
 - Initial release 
