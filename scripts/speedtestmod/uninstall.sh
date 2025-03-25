@@ -86,6 +86,15 @@ if [ -z "$INDEX_FILE" ]; then
     exit 1
 fi
 
+# Backup the index file
+log_info "Creating backup of index file..."
+BACKUP_FILE="${INDEX_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+if ! sudo cp "$INDEX_FILE" "$BACKUP_FILE"; then
+    log_error "Failed to create backup of index file"
+else
+    log_info "Created backup at: $BACKUP_FILE"
+fi
+
 # Remove speedtest files
 log_info "Removing speedtest files..."
 if [ -f "$WEB_DIR/scripts/js/speedtest.js" ]; then
@@ -123,25 +132,44 @@ fi
 
 # Remove speedtest widget from dashboard
 log_info "Checking for speedtest widget in dashboard..."
-if grep -q "speedtest-results" "$INDEX_FILE"; then
-    log_debug "Found speedtest widget, removing..."
-    if ! sudo sed -i '/<!-- Add Speedtest Widget -->/,/<!-- \/\.\/col -->\n<\/div>/d' "$INDEX_FILE"; then
-        log_error "Failed to remove speedtest widget"
+# Check for various patterns that might indicate the speedtest widget
+if grep -q "speedtest" "$INDEX_FILE"; then
+    log_debug "Found speedtest references in index file"
+    # Try to find the widget section
+    if grep -q "<!-- Add Speedtest Widget -->" "$INDEX_FILE"; then
+        log_debug "Found standard widget marker, removing..."
+        if ! sudo sed -i '/<!-- Add Speedtest Widget -->/,/<!-- \/\.\/col -->\n<\/div>/d' "$INDEX_FILE"; then
+            log_error "Failed to remove speedtest widget (standard pattern)"
+        else
+            log_info "Successfully removed speedtest widget (standard pattern)"
+        fi
     else
-        log_info "Successfully removed speedtest widget"
+        log_debug "Trying alternative widget patterns..."
+        # Try to find and remove the widget section using alternative patterns
+        if ! sudo sed -i '/<div class="col-md-6">/,/<\/div>/d' "$INDEX_FILE"; then
+            log_error "Failed to remove speedtest widget (alternative pattern)"
+        else
+            log_info "Successfully removed speedtest widget (alternative pattern)"
+        fi
     fi
 else
-    log_debug "Speedtest widget not found in dashboard"
+    log_debug "No speedtest references found in index file"
 fi
 
 # Remove speedtest script from page
 log_info "Checking for speedtest script in page..."
 if grep -q "speedtest.js" "$INDEX_FILE"; then
     log_debug "Found speedtest script reference, removing..."
+    # Try multiple patterns for script removal
     if ! sudo sed -i '/<!-- Add Speedtest Script -->/,/<script src="<?=pihole.fileversion('\''scripts\/js\/speedtest.js'\'')?>">/d' "$INDEX_FILE"; then
-        log_error "Failed to remove speedtest script reference"
+        log_debug "Failed to remove script (standard pattern), trying alternative..."
+        if ! sudo sed -i '/<script src="scripts\/js\/speedtest.js">/d' "$INDEX_FILE"; then
+            log_error "Failed to remove speedtest script reference"
+        else
+            log_info "Successfully removed speedtest script reference (alternative pattern)"
+        fi
     else
-        log_info "Successfully removed speedtest script reference"
+        log_info "Successfully removed speedtest script reference (standard pattern)"
     fi
 else
     log_debug "Speedtest script reference not found in page"
@@ -194,6 +222,7 @@ echo
 if [ $UNINSTALL_ERRORS -eq 0 ]; then
     log_info "Speedtest mod uninstalled successfully!"
     log_info "Please refresh your Pi-hole web interface to see the changes."
+    log_info "If you still see the speedtest widget, please try clearing your browser cache."
 else
     log_error "Speedtest mod uninstallation completed with $UNINSTALL_ERRORS error(s):"
     for error in "${ERROR_MESSAGES[@]}"; do
