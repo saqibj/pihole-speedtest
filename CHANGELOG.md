@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2024-03-24
+
+### Added
+- Automatic web interface directory detection
+- Support for multiple Pi-hole web interface locations
+- Flexible file detection for index and settings files
+- Better error handling and user feedback during installation
+
+### Changed
+- Improved installation script robustness
+- Enhanced error messages and warnings
+- Better handling of file modifications
+- More informative progress messages
+
+### Fixed
+- Installation failures on different Pi-hole web interface paths
+- File permission issues during installation
+- Script insertion point detection
+- Web interface file modification reliability
+
 ## [2.0.0] - 2024-03-21
 
 ### Changed

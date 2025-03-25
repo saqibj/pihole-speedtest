@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version information
-MOD_VERSION="2.0.0"
+MOD_VERSION="2.1.0"
 REQUIRED_PIHOLE_VERSION="6.x"
 
 # Check if Pi-hole is installed
@@ -54,6 +54,25 @@ echo "Installing speedtest script..."
 sudo cp "$SCRIPT_DIR/speedtest.sh" /usr/local/bin/pihole-6-speedtest
 sudo chmod +x /usr/local/bin/pihole-6-speedtest
 
+# Find Pi-hole web interface directory
+if [ ! -d "$WEB_DIR" ]; then
+    echo "Looking for Pi-hole web interface directory..."
+    # Try common locations
+    for dir in "/var/www/html/admin" "/var/www/html/pihole" "/var/www/pihole" "/var/www/html"; do
+        if [ -d "$dir" ]; then
+            WEB_DIR="$dir"
+            echo "Found web interface at: $WEB_DIR"
+            break
+        fi
+    done
+fi
+
+if [ ! -d "$WEB_DIR" ]; then
+    echo "Error: Could not find Pi-hole web interface directory"
+    echo "Please ensure Pi-hole is properly installed"
+    exit 1
+fi
+
 # Create web interface files
 echo "Installing web interface files..."
 sudo mkdir -p "$WEB_DIR/scripts/js/"
@@ -61,25 +80,68 @@ sudo mkdir -p "$WEB_DIR/style/"
 sudo cp "$SCRIPT_DIR/speedtest.js" "$WEB_DIR/scripts/js/"
 sudo cp "$SCRIPT_DIR/speedtest.css" "$WEB_DIR/style/"
 
-# Add speedtest widget to dashboard
-if ! grep -q "speedtest" "$WEB_DIR/index.php"; then
-    echo "Adding speedtest widget to dashboard..."
-    sudo sed -i '/<div class="row">/ a <!-- Add Speedtest Widget -->' "$WEB_DIR/index.php"
-    sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$WEB_DIR/index.php"
+# Find index file
+INDEX_FILE=""
+for file in "index.php" "index.lp" "index.html"; do
+    if [ -f "$WEB_DIR/$file" ]; then
+        INDEX_FILE="$WEB_DIR/$file"
+        echo "Found index file: $INDEX_FILE"
+        break
+    fi
+done
+
+if [ -z "$INDEX_FILE" ]; then
+    echo "Error: Could not find index file in web interface directory"
+    exit 1
 fi
 
-# Add speedtest settings to system settings
-if ! grep -q "speedtest" "$WEB_DIR/settings.php"; then
-    echo "Adding speedtest settings..."
-    sudo sed -i '/<div class="col-md-12">/ a <!-- Add Speedtest Settings -->' "$WEB_DIR/settings.php"
-    sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="box box-primary">\n      <div class="box-header with-border">\n        <h3 class="box-title">Speedtest Settings</h3>\n      </div>\n      <div class="box-body">\n        <div class="form-group">\n          <label for="speedtest-interval">Test Interval (hours)</label>\n          <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n        </div>\n        <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n      </div>\n    </div>' "$WEB_DIR/settings.php"
+# Add speedtest widget to dashboard
+if ! grep -q "speedtest" "$INDEX_FILE"; then
+    echo "Adding speedtest widget to dashboard..."
+    # Try to find a good insertion point
+    if grep -q "<div class=\"row\">" "$INDEX_FILE"; then
+        sudo sed -i '/<div class="row">/ a <!-- Add Speedtest Widget -->' "$INDEX_FILE"
+        sudo sed -i '/<!-- Add Speedtest Widget -->/ a\    <div class="col-md-6">\n      <div class="box box-primary">\n        <div class="box-header with-border">\n          <h3 class="box-title">Speedtest Results</h3>\n        </div>\n        <div class="box-body">\n          <div id="speedtest-chart"></div>\n        </div>\n      </div>\n    </div>' "$INDEX_FILE"
+    else
+        echo "Warning: Could not find suitable insertion point for widget"
+    fi
+fi
+
+# Find settings file
+SETTINGS_FILE=""
+for file in "settings.php" "settings-system.php" "settings-system.lp"; do
+    if [ -f "$WEB_DIR/$file" ]; then
+        SETTINGS_FILE="$WEB_DIR/$file"
+        echo "Found settings file: $SETTINGS_FILE"
+        break
+    fi
+done
+
+if [ -n "$SETTINGS_FILE" ]; then
+    # Add speedtest settings to system settings
+    if ! grep -q "speedtest" "$SETTINGS_FILE"; then
+        echo "Adding speedtest settings..."
+        # Try to find a good insertion point
+        if grep -q "<div class=\"col-md-12\">" "$SETTINGS_FILE"; then
+            sudo sed -i '/<div class="col-md-12">/ a <!-- Add Speedtest Settings -->' "$SETTINGS_FILE"
+            sudo sed -i '/<!-- Add Speedtest Settings -->/ a\    <div class="box box-primary">\n      <div class="box-header with-border">\n        <h3 class="box-title">Speedtest Settings</h3>\n      </div>\n      <div class="box-body">\n        <div class="form-group">\n          <label for="speedtest-interval">Test Interval (hours)</label>\n          <input type="number" class="form-control" id="speedtest-interval" min="1" max="24" value="6">\n        </div>\n        <button type="button" class="btn btn-primary" id="run-speedtest">Run Speedtest Now</button>\n      </div>\n    </div>' "$SETTINGS_FILE"
+        else
+            echo "Warning: Could not find suitable insertion point for settings"
+        fi
+    fi
+else
+    echo "Warning: Could not find settings file"
 fi
 
 # Add speedtest script to page
-if ! grep -q "speedtest.js" "$WEB_DIR/index.php"; then
+if ! grep -q "speedtest.js" "$INDEX_FILE"; then
     echo "Adding speedtest script to page..."
-    sudo sed -i '/<\/body>/ i <!-- Add Speedtest Script -->' "$WEB_DIR/index.php"
-    sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$WEB_DIR/index.php"
+    if grep -q "</body>" "$INDEX_FILE"; then
+        sudo sed -i '/<\/body>/ i <!-- Add Speedtest Script -->' "$INDEX_FILE"
+        sudo sed -i '/<!-- Add Speedtest Script -->/ a\    <script src="scripts/js/speedtest.js"></script>' "$INDEX_FILE"
+    else
+        echo "Warning: Could not find suitable insertion point for script"
+    fi
 fi
 
 # Set proper permissions
