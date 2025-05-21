@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-05-21
+
+### Added
+- Added support for Pi-hole v6's embedded web server and REST API
+- Added detailed server information display (IP and location)
+- Added loading states and better UI feedback
+- Added automatic message dismissal for alerts
+- Added proper Bootstrap 5 classes for better responsiveness
+
+### Changed
+- Updated web interface integration to use Pi-hole v6's widget system
+- Updated API to use Pi-hole v6's embedded REST API
+- Updated database schema to store more detailed speedtest information
+- Modernized JavaScript to use Fetch API
+- Updated UI components to match Pi-hole v6 design
+- Improved error handling and user feedback
+
+### Fixed
+- Fixed database ownership for Pi-hole v6
+- Fixed API endpoint integration
+- Fixed widget styling to match Pi-hole v6
+- Fixed permission issues with database files
+
 ## [2.1.3] - 2024-03-25
 
 ### Added

@@ -2,7 +2,7 @@
 
 ![Speedtest Chart](https://raw.githubusercontent.com/arevindh/AdminLTE/master/img/st-chart.png)
 
-[![Version](https://img.shields.io/badge/version-2.1.3-blue.svg)](https://github.com/saqibj/pihole-speedtest/releases)
+[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](https://github.com/saqibj/pihole-speedtest/releases)
 [![Pi-hole Version](https://img.shields.io/badge/Pi--hole-6.x-blue)](https://pi-hole.net/)
 [![Shell Script](https://img.shields.io/badge/Shell_Script-%23121011.svg?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
@@ -17,6 +17,7 @@ A Pi-hole extension that adds speedtest functionality directly to your Pi-hole d
 - Run speedtests directly from the Pi-hole web interface
 - Automatic speedtest scheduling with configurable intervals
 - Beautiful charts showing download and upload speeds over time
+- Detailed server information (IP and location)
 - Historical data storage in SQLite database
 - Real-time speedtest results display
 - Mobile-responsive design
@@ -36,7 +37,7 @@ A Pi-hole extension that adds speedtest functionality directly to your Pi-hole d
 ### Quick Install
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.1.3/mod | sudo bash
+curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.2.0/mod | sudo bash
 ```
 
 ### Manual Installation
@@ -73,7 +74,7 @@ docker run -d \
 ### Quick Uninstall
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.1.3/scripts/speedtestmod/uninstall.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.2.0/scripts/speedtestmod/uninstall.sh | sudo bash
 ```
 
 ### Manual Uninstallation
