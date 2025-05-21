@@ -1,12 +1,12 @@
 FROM pihole/pihole:latest
 
 # Install the speedtest mod
-RUN curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.1.3/mod | sudo bash
+RUN curl -sSL https://raw.githubusercontent.com/saqibj/pihole-speedtest/v2.2.0/mod | sudo bash
 
 # Set the default tag
 LABEL maintainer="saqibj <https://github.com/saqibj>"
 LABEL description="Pi-Hole 6.x with Speedtest Mod"
-LABEL version="2.1.3"
+LABEL version="2.2.0"
 LABEL pihole_version="6.x"
 
 # Copy mod files
